@@ -18,6 +18,8 @@
 #define SHT21_WR     0x80
 #define SHT21_RD     0x81
 
+#define SHT21_TEMP_FROM_VAL(x) (float)((175.72 * x) / 65536) - 46.85f;
+
 typedef enum
 {
     CMD_TRIG_T_HOLD     = 0xE3,
