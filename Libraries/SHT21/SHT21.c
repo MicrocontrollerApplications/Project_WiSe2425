@@ -41,7 +41,8 @@ void wrSHT21(TYPE_SHT21_CMD cmd)
     StopI2C1();
 }
 
-void rdSHT21(uint8_t *pntData)
+#define MASK_STATUS_BITS 0x03
+void rdSHT21(uint16_t *pntData)
 {
     IdleI2C1();                             // 
     StartI2C1();                            // send start condition
@@ -49,9 +50,12 @@ void rdSHT21(uint8_t *pntData)
     WriteI2C1(SHT21_RD);                    // addressing 
     while(SSP1CON2bits.ACKSTAT){;}          // ACK from sensor
     
-    pntData[1] = ReadI2C1();                // MSB
+    *pntData = ReadI2C1();                  // MSB
+    *pntData <<= 8;
     AckI2C1();                              // ACK master
-    pntData[0] = ReadI2C1();                // LSB
+    *pntData |= ReadI2C1();                  // LSB
+    // mask out status bits - see chapter 5.4 (bottom right paragraph)
+    *pntData &= ~MASK_STATUS_BITS;
     NotAckI2C1();                           // NACK master
     StopI2C1();
 }
