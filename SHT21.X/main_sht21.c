@@ -1,7 +1,7 @@
 //##############################################################################
 //      filename:        main.c
 //
-//      main file for ÂµC lecture projects
+//      main file for µC lecture projects
 //
 //##############################################################################
 //
@@ -30,12 +30,12 @@
 #define TMR1_85MS_OFFSET 65535 - 42500 // 42500 cycles = 85ms  (Fosc = 16MHz)
 #define TMR1_85MS_PS 0b11
 
-static void __init();
-static void __interrupt(high_priority) __isr();
+static void __init(void);
+static void __interrupt(high_priority) __isr(void);
 static void decimal_to_glcd(float decimal);
 
 static char new_meas = 0;
-static uint16_t valT; //42Â°C as initial value
+static uint16_t valT; //42°C as initial value
 static uint16_t valRH;
 
 int main() {
@@ -47,8 +47,11 @@ int main() {
         if (new_meas) {
             new_meas = 0;
             temperature = SHT21_TEMP_FROM_VAL(valT);
-            if (temperature) {
+            if (temperature >= -40 && temperature <= 125) {
                 decimal_to_glcd(temperature);
+            }else{
+                GLCD_Text2Out(1, 0, " XX.XX C");
+                GLCD_Text2Out(2, 0, " !!ERROR!!");
             }
         }
     }
@@ -97,14 +100,13 @@ static void __init() {
 static void __interrupt(high_priority) __isr() {
     if (INTCONbits.TMR0IE && INTCONbits.TMR0IF) {
         INTCONbits.TMR0IF = 0;
-        // reset Timer 0
-        T0CONbits.TMR0ON = 0;
-        TMR0 = TMR0_1S_OFFSET;
-        T0CONbits.TMR0ON = 1;
+        // offset Timer 0
+        TMR0 += TMR0_1S_OFFSET;
 
         // send measure command to SHT21
         wrSHT21(CMD_TRIG_T);
         // start delay timer
+        TMR1 = TMR1_85MS_OFFSET;
         T1CONbits.TMR1ON = 1;
 
         return;
@@ -117,9 +119,8 @@ static void __interrupt(high_priority) __isr() {
         PIR1bits.TMR1IF = 0;
         // set flag to indicate new measurement value
         new_meas = 1;
-        // reset delay timer for next run
+        // disable delay timer
         T1CONbits.TMR1ON = 0;
-        TMR1 = TMR1_85MS_OFFSET;
         
         return;
     }
