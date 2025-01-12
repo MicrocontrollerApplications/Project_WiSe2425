@@ -50,6 +50,9 @@ enum STATE {
 
 //static enum STATE state = TEMP_HUMIDITY;
 
+
+// TODO: clear Display on state change.
+// TODO: numeral to string conversion must be enhanced for |num| >= 100 case.
 int main() {
     __init();
 
@@ -70,6 +73,41 @@ int main() {
                     decimal_to_glcd(humidity, "pcnt");
                 }
             } else if (TEMP_HUMIDITY == state) {
+                unsigned char col = 0 == meas_counter ? 1 : 8;
+                float decimal = 0 == meas_counter ?
+                        SHT21_TEMP_FROM_VAL(retVal) : SHT21_RH_FROM_VAL(retVal);
+                ++meas_counter;
+                meas_counter = meas_counter > 1 ? 0 : meas_counter;
+
+                int8_t integer_part = (int8_t) decimal;
+                int8_t decimal_part = (int8_t) ((decimal - integer_part)*100);
+
+                GLCD_MODE();
+                GLCD_Clear();
+                GLCD_Text2Out(0, 1, "SHT21");
+                GLCD_TextOut(2, 0, " TEMP   HUM ");
+                unsigned char sign = ' ';
+                if (integer_part < 0) {
+                    sign = '-';
+                    integer_part *= -1;
+                }
+                // @VSK Is here a bug?
+                // unsigned char int1 = integer_part/10 +48;
+                // GLCD_CharOut(3, col++, int1);
+
+                static unsigned char text[] = " 00.00  00.00";
+                if(1 == meas_counter){
+                    text[col-1] = sign;
+                }
+                
+                text[col++] = integer_part / 10 + 48;
+                text[col++] = integer_part % 10 + 48;
+                ++col;
+                text[col++] = decimal_part / 10 + 48;
+                text[col++] = decimal_part % 10 + 48;
+                    
+                GLCD_TextOut(3, 0, &text);
+                I2C_MODE();
             } else {
                 GLCD_Text2Out(1, 0, " XX.XX ");
                 GLCD_Text2Out(2, 0, " !!ERROR!!");
@@ -158,6 +196,11 @@ static void __interrupt(high_priority) __isr() {
         T1CONbits.TMR1ON = 0;
 
         if (TEMP_HUMIDITY == state && 0 == meas_counter) {
+            // send measure command to SHT21
+            wrSHT21(CMD_TRIG_RH);
+            // start delay timer
+            TMR1 = TMR1_29MS_OFFSET;
+            T1CONbits.TMR1ON = 1;
         }
 
         return;
