@@ -55,7 +55,7 @@ void rdSHT21(uint16_t *pntData)
     AckI2C1();                              // ACK master
     *pntData |= ReadI2C1();                  // LSB
     // mask out status bits - see chapter 5.4 (bottom right paragraph)
-    *pntData &= ~MASK_STATUS_BITS;
+    *pntData &= (uint16_t)(~MASK_STATUS_BITS);
     NotAckI2C1();                           // NACK master
     StopI2C1();
 }
