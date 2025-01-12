@@ -40,15 +40,15 @@ static void decimal_to_glcd(float decimal, char* unit);
 
 static char new_meas = 0;
 static uint16_t retVal;
+static unsigned char meas_counter = 0;
 
 enum STATE {
     TEMPERATURE,
-    TEMP_HUMIDITY, // currently not implemented. As complexity might be to huge 
-    // for students.
     HUMIDITY,
-};
+    TEMP_HUMIDITY,
+} state = TEMP_HUMIDITY;
 
-static enum STATE state = TEMPERATURE;
+//static enum STATE state = TEMP_HUMIDITY;
 
 int main() {
     __init();
@@ -59,22 +59,20 @@ int main() {
     while (1) {
         if (new_meas) {
             new_meas = 0;
-            switch (state) {
-                case TEMPERATURE:
-                    temperature = SHT21_TEMP_FROM_VAL(retVal);
-                    if (temperature >= -40 && temperature <= 125) {
-                        decimal_to_glcd(temperature, "C");
-                    }
-                    break;
-                case HUMIDITY:
-                    humidity = SHT21_RH_FROM_VAL(retVal);
-                    if (humidity >= 0 && humidity <= 100) {
-                        decimal_to_glcd(humidity, "pcnt");
-                    }
-                    break;
-                default:
-                    GLCD_Text2Out(1, 0, " XX.XX C");
-                    GLCD_Text2Out(2, 0, " !!ERROR!!");
+            if (TEMPERATURE == state) {
+                temperature = SHT21_TEMP_FROM_VAL(retVal);
+                if (temperature >= -40 && temperature <= 125) {
+                    decimal_to_glcd(temperature, "C");
+                }
+            } else if (HUMIDITY == state) {
+                humidity = SHT21_RH_FROM_VAL(retVal);
+                if (humidity >= 0 && humidity <= 100) {
+                    decimal_to_glcd(humidity, "pcnt");
+                }
+            } else if (TEMP_HUMIDITY == state) {
+            } else {
+                GLCD_Text2Out(1, 0, " XX.XX ");
+                GLCD_Text2Out(2, 0, " !!ERROR!!");
             }
         }
     }
@@ -124,77 +122,53 @@ static void __init() {
 }
 
 static void __interrupt(high_priority) __isr() {
-    switch (state) {
-        case TEMPERATURE:
-            if (INTCONbits.TMR0IE && INTCONbits.TMR0IF) {
-                INTCONbits.TMR0IF = 0;
-                // offset Timer 0
-                // TMR0 = TMR0 + TMR0_1S_OFFSET; // does not work? ~3s intervals
-                T0CONbits.TMR0ON = 0;
-                TMR0 = TMR0_1S_OFFSET;
-                T0CONbits.TMR0ON = 1;
+    if (INTCONbits.TMR0IE && INTCONbits.TMR0IF) {
+        INTCONbits.TMR0IF = 0;
+        // offset Timer 0
+        // TMR0 = TMR0 + TMR0_1S_OFFSET; // does not work? ~3s intervals
+        T0CONbits.TMR0ON = 0;
+        TMR0 = TMR0_1S_OFFSET;
+        T0CONbits.TMR0ON = 1;
 
-                // send measure command to SHT21
-                wrSHT21(CMD_TRIG_T);
-                // start delay timer
-                TMR1 = TMR1_85MS_OFFSET;
-                T1CONbits.TMR1ON = 1;
+        if (TEMPERATURE == state || TEMP_HUMIDITY == state) {
+            // send measure command to SHT21
+            wrSHT21(CMD_TRIG_T);
+            // start delay timer
+            TMR1 = TMR1_85MS_OFFSET;
+        } else if (HUMIDITY == state) {
+            // send measure command to SHT21
+            wrSHT21(CMD_TRIG_RH);
+            // start delay timer
+            TMR1 = TMR1_29MS_OFFSET;
+        }
 
-                return;
-            }
+        T1CONbits.TMR1ON = 1;
 
-            if (PIE1bits.TMR1IE && PIR1bits.TMR1IF) {
-                PIR1bits.TMR1IF = 0;
-                // immediately read new value
-                rdSHT21(&retVal);
+        return;
+    }
 
-                // set flag to indicate new measurement value
-                new_meas = 1;
-                // disable delay timer
-                T1CONbits.TMR1ON = 0;
+    if (PIE1bits.TMR1IE && PIR1bits.TMR1IF) {
+        PIR1bits.TMR1IF = 0;
+        // immediately read new value
+        rdSHT21(&retVal);
 
-                return;
-            }
-            break;
-        case HUMIDITY:
-            if (INTCONbits.TMR0IE && INTCONbits.TMR0IF) {
-                INTCONbits.TMR0IF = 0;
-                // offset Timer 0
-                // TMR0 = TMR0 + TMR0_1S_OFFSET; // does not work? ~3s intervals
-                T0CONbits.TMR0ON = 0;
-                TMR0 = TMR0_1S_OFFSET;
-                T0CONbits.TMR0ON = 1;
+        // set flag to indicate new measurement value
+        new_meas = 1;
+        // disable delay timer
+        T1CONbits.TMR1ON = 0;
 
-                // send measure command to SHT21
-                wrSHT21(CMD_TRIG_RH);
-                // start delay timer
-                TMR1 = TMR1_29MS_OFFSET;
-                T1CONbits.TMR1ON = 1;
+        if (TEMP_HUMIDITY == state && 0 == meas_counter) {
+        }
 
-                return;
-            }
-
-            if (PIE1bits.TMR1IE && PIR1bits.TMR1IF) {
-                PIR1bits.TMR1IF = 0;
-                // immediately read new value
-                rdSHT21(&retVal);
-
-                // set flag to indicate new measurement value
-                new_meas = 1;
-                // disable delay timer
-                T1CONbits.TMR1ON = 0;
-
-                return;
-            }
-
-            break;
+        return;
     }
 
     if (INTCON3bits.INT1E && INTCON3bits.INT1IF) {
         INTCON3bits.INT1IF = 0;
-        // state = 3 == state ? 0 : ++state;
-        // workaround due to missing TEMP_HUMIDITY state
-        state = 0 == state ? 2 : 0;
+        ++state;
+        if (state > TEMP_HUMIDITY)
+            state = TEMPERATURE;
+
         return;
     }
 
