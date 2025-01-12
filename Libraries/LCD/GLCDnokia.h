@@ -75,7 +75,7 @@ extern const char charSet16x7[];
 #define CMD         0
 #define DTA         1
 
-// intruction set
+// instruction set
 #define DSPL_NOP    0x00
 #define DSPL_FKT    0x20
 // basic instruction set (H = 0)

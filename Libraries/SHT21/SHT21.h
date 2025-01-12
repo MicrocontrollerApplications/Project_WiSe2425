@@ -18,7 +18,7 @@
 #define SHT21_WR     0x80
 #define SHT21_RD     0x81
 
-#define SHT21_TEMP_FROM_VAL(x) (float)((175.72 * x) / 65536) - 46.85f;
+#define SHT21_TEMP_FROM_VAL(x) (float)((175.72 * x) / 65536) - 46.85f
 #define SHT21_RH_FROM_VAL(x) 125.f*x/65536.f - 6.f
 
 typedef enum
