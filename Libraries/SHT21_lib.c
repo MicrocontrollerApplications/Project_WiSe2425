@@ -10,8 +10,8 @@
 #include "SHT21/SHT21.h"
 #include "LCD/GLCDnokia.h"
 
-#define TMR1_85MS_OFFSET 23035 //(65535 - 85*500)    // 500 cycles =  1ms  (Fosc = 16MHz)
-#define TMR1_29MS_OFFSET 51035 //(65535 - 29*500)
+#define TMR1_85MS_OFFSET (65535 - 85*500)    // 500 cycles =  1ms  (Fosc = 16MHz)
+#define TMR1_29MS_OFFSET (65535 - 29*500)
 #define GLCD_MODE() {SSP1CON1bits.SSPEN = 0; TRISCbits.TRISC3 = 0;}
 #define I2C_MODE() {TRISCbits.TRISC3 = 1; SSP1CON1bits.SSPEN = 1;}
 
