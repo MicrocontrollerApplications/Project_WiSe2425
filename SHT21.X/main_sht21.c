@@ -33,7 +33,7 @@ static void __init(void);
 static void __interrupt(high_priority) __isr(void);
 
 // Initialize SHT21 object
-static SHT21_State sht21_sensor = {
+static SHT21 sht21_sensor = {
     .current_state = TEMPERATURE,
     .measurement_type = TEMPERATURE,
     .state_transition = 0,
