@@ -5,11 +5,10 @@
  * Revision history: v.01 - initial library
  */
 
-// This is a guard condition so that contents of this file are not included
-// more than once.  
-
 #include <xc.h>
 
+// This is a guard condition so that contents of this file are not included
+// more than once.  
 #ifndef SHT21_LIB
 #define	SHT21_LIB
 
@@ -23,8 +22,10 @@ typedef struct {
     State current_state;
     State measurement_type;
     unsigned char state_transition;
-    unsigned char new_meas;
     float  measurement;
+    unsigned char new_meas;
+    unsigned char new_temp_meas;
+    unsigned char new_rh_meas;
     unsigned char await_rh_meas;
     
 }SHT21_State;
