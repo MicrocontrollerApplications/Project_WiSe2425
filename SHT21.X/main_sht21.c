@@ -22,6 +22,8 @@
 #include "uCQuick/uCQ_2018.h"
 #include "SHT21/SHT21.h"
 #include "LCD/GLCDnokia.h"
+#include "SHT21_lib.h"
+
 #define MILLION 1000*1000UL
 #define _XTAL_FREQ 16*MILLION
 
@@ -31,8 +33,7 @@
 #define TMR1_29MS_OFFSET (65535 - 29*500)   //   500 cycles =  1ms  (Fosc = 16MHz)
 #define TMR1_85MS_PS 0b11
 
-#define GLCD_MODE() {SSP1CON1bits.SSPEN = 0; TRISCbits.TRISC3 = 0;}
-#define I2C_MODE() {TRISCbits.TRISC3 = 1; SSP1CON1bits.SSPEN = 1;}
+
 
 static void __init(void);
 static void __interrupt(high_priority) __isr(void);
@@ -42,76 +43,25 @@ static char new_meas = 0;
 static uint16_t retVal;
 static unsigned char meas_counter = 0;
 
-enum STATE {
-    TEMPERATURE,
-    HUMIDITY,
-    TEMP_HUMIDITY,
-} state = TEMP_HUMIDITY;
-
-//static enum STATE state = TEMP_HUMIDITY;
-
+static SHT21_State sht21_state = {
+    .await_rh_meas = 0,
+    .current_state = HUMIDITY,
+    .measurement_type = HUMIDITY,
+    .new_meas = 0,
+    .measurement = 0,
+    .state_transition = 0,
+};
 
 // TODO: clear Display on state change.
 // TODO: numeral to string conversion must be enhanced for |num| >= 100 case.
+
 int main() {
     __init();
-
-    int8_t temp_int, temp_dec;
-    float temperature;
-    float humidity;
-    while (1) {
-        if (new_meas) {
-            new_meas = 0;
-            if (TEMPERATURE == state) {
-                temperature = SHT21_TEMP_FROM_VAL(retVal);
-                if (temperature >= -40 && temperature <= 125) {
-                    decimal_to_glcd(temperature, "C");
-                }
-            } else if (HUMIDITY == state) {
-                humidity = SHT21_RH_FROM_VAL(retVal);
-                if (humidity >= 0 && humidity <= 100) {
-                    decimal_to_glcd(humidity, "pcnt");
-                }
-            } else if (TEMP_HUMIDITY == state) {
-                unsigned char col = 0 == meas_counter ? 1 : 8;
-                float decimal = 0 == meas_counter ?
-                        SHT21_TEMP_FROM_VAL(retVal) : SHT21_RH_FROM_VAL(retVal);
-                ++meas_counter;
-                meas_counter = meas_counter > 1 ? 0 : meas_counter;
-
-                int8_t integer_part = (int8_t) decimal;
-                int8_t decimal_part = (int8_t) ((decimal - integer_part)*100);
-
-                GLCD_MODE();
-                GLCD_Clear();
-                GLCD_Text2Out(0, 1, "SHT21");
-                GLCD_TextOut(2, 0, " TEMP   HUM ");
-                unsigned char sign = ' ';
-                if (integer_part < 0) {
-                    sign = '-';
-                    integer_part *= -1;
-                }
-                // @VSK Is here a bug?
-                // unsigned char int1 = integer_part/10 +48;
-                // GLCD_CharOut(3, col++, int1);
-
-                static unsigned char text[] = " 00.00  00.00";
-                if(1 == meas_counter){
-                    text[col-1] = sign;
-                }
-                
-                text[col++] = integer_part / 10 + 48;
-                text[col++] = integer_part % 10 + 48;
-                ++col;
-                text[col++] = decimal_part / 10 + 48;
-                text[col++] = decimal_part % 10 + 48;
-                    
-                GLCD_TextOut(3, 0, &text);
-                I2C_MODE();
-            } else {
-                GLCD_Text2Out(1, 0, " XX.XX ");
-                GLCD_Text2Out(2, 0, " !!ERROR!!");
-            }
+    
+    while (1) {        
+        if (sht21_state.new_meas) {
+            sht21_state.new_meas = 0;
+            sht21_print_measurement(&sht21_state);
         }
     }
 }
@@ -167,40 +117,19 @@ static void __interrupt(high_priority) __isr() {
         T0CONbits.TMR0ON = 0;
         TMR0 = TMR0_1S_OFFSET;
         T0CONbits.TMR0ON = 1;
-
-        if (TEMPERATURE == state || TEMP_HUMIDITY == state) {
-            // send measure command to SHT21
-            wrSHT21(CMD_TRIG_T);
-            // start delay timer
-            TMR1 = TMR1_85MS_OFFSET;
-        } else if (HUMIDITY == state) {
-            // send measure command to SHT21
-            wrSHT21(CMD_TRIG_RH);
-            // start delay timer
-            TMR1 = TMR1_29MS_OFFSET;
-        }
-
-        T1CONbits.TMR1ON = 1;
+        
+        start_measurement(&sht21_state);
 
         return;
+
     }
 
     if (PIE1bits.TMR1IE && PIR1bits.TMR1IF) {
         PIR1bits.TMR1IF = 0;
-        // immediately read new value
-        rdSHT21(&retVal);
-
-        // set flag to indicate new measurement value
-        new_meas = 1;
-        // disable delay timer
         T1CONbits.TMR1ON = 0;
-
-        if (TEMP_HUMIDITY == state && 0 == meas_counter) {
-            // send measure command to SHT21
-            wrSHT21(CMD_TRIG_RH);
-            // start delay timer
-            TMR1 = TMR1_29MS_OFFSET;
-            T1CONbits.TMR1ON = 1;
+        get_measurement(&sht21_state);
+        if (TEMP_HUMIDITY == sht21_state.current_state && sht21_state.await_rh_meas){
+            start_measurement(&sht21_state);
         }
 
         return;
@@ -208,9 +137,7 @@ static void __interrupt(high_priority) __isr() {
 
     if (INTCON3bits.INT1E && INTCON3bits.INT1IF) {
         INTCON3bits.INT1IF = 0;
-        ++state;
-        if (state > TEMP_HUMIDITY)
-            state = TEMPERATURE;
+        sht21_next_state(&sht21_state);
 
         return;
     }
@@ -219,16 +146,4 @@ static void __interrupt(high_priority) __isr() {
     while (1) {
         Nop();
     }
-}
-
-static void decimal_to_glcd(float decimal, char* unit) {
-
-    int8_t integer_part = (int8_t) decimal;
-    int8_t decimal_part = (int8_t) ((decimal - integer_part)*100);
-
-    GLCD_MODE();
-    GLCD_Value2Out_00(1, 1, integer_part, 2);
-    GLCD_Value2Out_00(1, 4, decimal_part, 2);
-    GLCD_Text2Out(1, 6, unit);
-    I2C_MODE();
 }

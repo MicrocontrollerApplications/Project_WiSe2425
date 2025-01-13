@@ -12,6 +12,7 @@
         <itemPath>../Libraries/PLIB/plib18fxxk22.h</itemPath>
       </logicalFolder>
       <itemPath>glcdNokia_config.h</itemPath>
+      <itemPath>../Libraries/SHT21_lib.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -34,6 +35,7 @@
       </logicalFolder>
       <itemPath>main_sht21.c</itemPath>
       <itemPath>uC_config.c</itemPath>
+      <itemPath>../Libraries/SHT21_lib.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
@@ -176,6 +178,7 @@
         <property key="event.recorder.debugger.behavior" value="Running"/>
         <property key="event.recorder.enabled" value="false"/>
         <property key="event.recorder.scvd.files" value=""/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="lastid" value=""/>
         <property key="memories.aux" value="false"/>
