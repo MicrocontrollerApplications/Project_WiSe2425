@@ -56,40 +56,52 @@ int main() {
 }
 
 static void __init() {
+    /*
+     * ATTENTION
+     * Below line is relevant! Which Fosc do we use?
+     */
     OSCCONbits.IRCF = IRCF_16MHZ;
 
     GLCD_Init();
     GLCD_Text2Out(0, 0, " SHT_21 ");
 
-    ANSELCbits.ANSC3 = ANSELCbits.ANSC4 = 0; // I2C pins
-    TRISCbits.TRISC3 = TRISCbits.TRISC4 = 1;
+    /*
+     * ATTENTION
+     * Exercise 4
+     * What is done below and why? Check the serial communication first! ;)
+     */
+    ANSELCbits.ANSC3 = 0;
+    ANSELCbits.ANSC4 = 0; 
+    TRISCbits.TRISC3 = 0;
+    TRISCbits.TRISC4 = 1;
 
     // Interrupts
     INTCONbits.GIE = 1;
     INTCONbits.PEIE = 1;
-    // Timer 0
-    INTCONbits.TMR0IF = 0;
-    INTCONbits.TMR0IE = 1;
-    // Timer 1
-    PIR1bits.TMR1IF = 0;
-    PIE1bits.TMR1IE = 1;
     // TM
     INTCON3bits.INT1F = 0;
     INTCON3bits.INT1E = 1;
     INTCON2bits.INTEDG1 = 1;
+    
+    /*
+     * ATTENTION
+     * Exercise 3.1
+     * Configure timer below!
+     * HINT: have a look at TMR0_1S_OFFSET could it be useful?
+     */
+    // Timer 0
+    
+    
+    // Timer 1
+    
+    
 
-    // Timer 0: measuring timer - duration 1s (Fosc = 16MHz)
-    T0CONbits.T08BIT = 0;
-    T0CONbits.T0CS = 0;
-    T0CONbits.PSA = 0;
-    T0CONbits.T0PS = 0b111; // Prescaler = 256
-    TMR0 = TMR0_1S_OFFSET;
-    T0CONbits.TMR0ON = 1;
+    // Timer 0 config: measuring timer - duration 1s
+    
 
-    // Timer 1: SHT21 I2C delay timer - duration 85ms (Fosc = 16MHz)
-    T1CONbits.TMR1CS = 0b00; // Fosc/4
-    T1CONbits.T1CKPS = 0b11; // PS = 8
-    T1CONbits.T1RD16 = 1; // 16 bit mode
+    // Timer 1: SHT21 delay timer
+    
+    
 
     SSP1ADD = 39; // I2C baudrate 100kHz
     initSHT21(MODE_RH12_T14_BIT | DIS_OC_HEATER | DIS_OTP_RELOAD);

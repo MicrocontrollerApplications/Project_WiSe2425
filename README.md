@@ -55,8 +55,7 @@ Gedanken und fragen uns, ob Sie auf dem richtigen Weg sind.
 Da Sie nun mit dem Sensor und der SHT21_lib vertraut sind, können wir damit beginnen den Sensor in Betrieb zu nehmen.
 In der Datei main_sht21.c fehlen einige Konfigurationen. Diese sind durch Kommentare gekennzeichnet.
 
->[!WARNING]
-> Show Comment example!
+https://github.com/Basti-iTAS-PLMS/MCON_Project_WiSe2425/blob/e706c5545c59039df6e85c25477cee6095c2b473/SHT21.X/main_sht21.c#L59-L62
 
 Stellen Sie sich folgenden Anwendungsfall vor:
 Sie wollen ihn ihrem Haus die Temperatur und Luftfeuchtigkeit durch Sensorik überprüfen (z.B. zur Vermeidung von 
