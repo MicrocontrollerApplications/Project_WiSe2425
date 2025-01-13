@@ -51,17 +51,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=../Libraries/LCD/GLCDnokia.c ../Libraries/LCD/charSet16x7.c ../Libraries/LCD/charSet8x5.c ../Libraries/PLIB/plib18fxxk22.c ../Libraries/SHT21/SHT21.c main_sht21.c uC_config.c
+SOURCEFILES_QUOTED_IF_SPACED=../Libraries/LCD/GLCDnokia.c ../Libraries/LCD/charSet16x7.c ../Libraries/LCD/charSet8x5.c ../Libraries/PLIB/plib18fxxk22.c ../Libraries/SHT21/SHT21.c main_sht21.c uC_config.c ../Libraries/SHT21_lib.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1178244344/GLCDnokia.p1 ${OBJECTDIR}/_ext/1178244344/charSet16x7.p1 ${OBJECTDIR}/_ext/1178244344/charSet8x5.p1 ${OBJECTDIR}/_ext/2129259034/plib18fxxk22.p1 ${OBJECTDIR}/_ext/1585182137/SHT21.p1 ${OBJECTDIR}/main_sht21.p1 ${OBJECTDIR}/uC_config.p1
-POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1178244344/GLCDnokia.p1.d ${OBJECTDIR}/_ext/1178244344/charSet16x7.p1.d ${OBJECTDIR}/_ext/1178244344/charSet8x5.p1.d ${OBJECTDIR}/_ext/2129259034/plib18fxxk22.p1.d ${OBJECTDIR}/_ext/1585182137/SHT21.p1.d ${OBJECTDIR}/main_sht21.p1.d ${OBJECTDIR}/uC_config.p1.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1178244344/GLCDnokia.p1 ${OBJECTDIR}/_ext/1178244344/charSet16x7.p1 ${OBJECTDIR}/_ext/1178244344/charSet8x5.p1 ${OBJECTDIR}/_ext/2129259034/plib18fxxk22.p1 ${OBJECTDIR}/_ext/1585182137/SHT21.p1 ${OBJECTDIR}/main_sht21.p1 ${OBJECTDIR}/uC_config.p1 ${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1
+POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1178244344/GLCDnokia.p1.d ${OBJECTDIR}/_ext/1178244344/charSet16x7.p1.d ${OBJECTDIR}/_ext/1178244344/charSet8x5.p1.d ${OBJECTDIR}/_ext/2129259034/plib18fxxk22.p1.d ${OBJECTDIR}/_ext/1585182137/SHT21.p1.d ${OBJECTDIR}/main_sht21.p1.d ${OBJECTDIR}/uC_config.p1.d ${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/_ext/1178244344/GLCDnokia.p1 ${OBJECTDIR}/_ext/1178244344/charSet16x7.p1 ${OBJECTDIR}/_ext/1178244344/charSet8x5.p1 ${OBJECTDIR}/_ext/2129259034/plib18fxxk22.p1 ${OBJECTDIR}/_ext/1585182137/SHT21.p1 ${OBJECTDIR}/main_sht21.p1 ${OBJECTDIR}/uC_config.p1
+OBJECTFILES=${OBJECTDIR}/_ext/1178244344/GLCDnokia.p1 ${OBJECTDIR}/_ext/1178244344/charSet16x7.p1 ${OBJECTDIR}/_ext/1178244344/charSet8x5.p1 ${OBJECTDIR}/_ext/2129259034/plib18fxxk22.p1 ${OBJECTDIR}/_ext/1585182137/SHT21.p1 ${OBJECTDIR}/main_sht21.p1 ${OBJECTDIR}/uC_config.p1 ${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1
 
 # Source Files
-SOURCEFILES=../Libraries/LCD/GLCDnokia.c ../Libraries/LCD/charSet16x7.c ../Libraries/LCD/charSet8x5.c ../Libraries/PLIB/plib18fxxk22.c ../Libraries/SHT21/SHT21.c main_sht21.c uC_config.c
+SOURCEFILES=../Libraries/LCD/GLCDnokia.c ../Libraries/LCD/charSet16x7.c ../Libraries/LCD/charSet8x5.c ../Libraries/PLIB/plib18fxxk22.c ../Libraries/SHT21/SHT21.c main_sht21.c uC_config.c ../Libraries/SHT21_lib.c
 
 
 
@@ -144,6 +144,14 @@ ${OBJECTDIR}/uC_config.p1: uC_config.c  nbproject/Makefile-${CND_CONF}.mk
 	@-${MV} ${OBJECTDIR}/uC_config.d ${OBJECTDIR}/uC_config.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/uC_config.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
+${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1: ../Libraries/SHT21_lib.c  nbproject/Makefile-${CND_CONF}.mk 
+	@${MKDIR} "${OBJECTDIR}/_ext/1536987926" 
+	@${RM} ${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1.d 
+	@${RM} ${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1  -mdebugger=pickit3   -mdfp="${DFP_DIR}/xc8"  -fno-short-double -fno-short-float -memi=wordwrite -O0 -fasmfile -maddrqual=ignore -xassembler-with-cpp -I"./" -I"../Libraries/" -mwarn=-3 -Wa,-a -DXPRJ_SHT21=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx32 -Wl,--data-init -mno-keep-startup -mno-download -mno-default-config-bits $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto:auto     -o ${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1 ../Libraries/SHT21_lib.c 
+	@-${MV} ${OBJECTDIR}/_ext/1536987926/SHT21_lib.d ${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1.d 
+	@${FIXDEPS} ${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
+	
 else
 ${OBJECTDIR}/_ext/1178244344/GLCDnokia.p1: ../Libraries/LCD/GLCDnokia.c  nbproject/Makefile-${CND_CONF}.mk 
 	@${MKDIR} "${OBJECTDIR}/_ext/1178244344" 
@@ -200,6 +208,14 @@ ${OBJECTDIR}/uC_config.p1: uC_config.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c   -mdfp="${DFP_DIR}/xc8"  -fno-short-double -fno-short-float -memi=wordwrite -O0 -fasmfile -maddrqual=ignore -xassembler-with-cpp -I"./" -I"../Libraries/" -mwarn=-3 -Wa,-a -DXPRJ_SHT21=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx32 -Wl,--data-init -mno-keep-startup -mno-download -mno-default-config-bits $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto:auto     -o ${OBJECTDIR}/uC_config.p1 uC_config.c 
 	@-${MV} ${OBJECTDIR}/uC_config.d ${OBJECTDIR}/uC_config.p1.d 
 	@${FIXDEPS} ${OBJECTDIR}/uC_config.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
+	
+${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1: ../Libraries/SHT21_lib.c  nbproject/Makefile-${CND_CONF}.mk 
+	@${MKDIR} "${OBJECTDIR}/_ext/1536987926" 
+	@${RM} ${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1.d 
+	@${RM} ${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c   -mdfp="${DFP_DIR}/xc8"  -fno-short-double -fno-short-float -memi=wordwrite -O0 -fasmfile -maddrqual=ignore -xassembler-with-cpp -I"./" -I"../Libraries/" -mwarn=-3 -Wa,-a -DXPRJ_SHT21=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx32 -Wl,--data-init -mno-keep-startup -mno-download -mno-default-config-bits $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto:auto     -o ${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1 ../Libraries/SHT21_lib.c 
+	@-${MV} ${OBJECTDIR}/_ext/1536987926/SHT21_lib.d ${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1.d 
+	@${FIXDEPS} ${OBJECTDIR}/_ext/1536987926/SHT21_lib.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
 endif
 

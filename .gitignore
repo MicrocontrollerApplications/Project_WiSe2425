@@ -2,3 +2,4 @@ build/
 debug/
 dist/
 private.xml
+.idea/
