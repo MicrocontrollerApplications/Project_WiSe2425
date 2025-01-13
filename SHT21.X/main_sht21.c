@@ -56,6 +56,10 @@ int main() {
 }
 
 static void __init() {
+    /*
+     * ATTENTION
+     * Below line is relevant! Which Fosc do we use?
+     */
     OSCCONbits.IRCF = IRCF_16MHZ;
 
     GLCD_Init();
