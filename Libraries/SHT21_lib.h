@@ -6,6 +6,7 @@
  */
 
 #include <xc.h>
+#include <stdbool.h>
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
@@ -28,12 +29,13 @@ typedef enum{
 typedef struct {
     State current_state;
     State measurement_type;
-    unsigned char state_transition;
+    bool state_transition;
     float  measurement;
-    unsigned char new_meas;
-    unsigned char new_temp_meas;
-    unsigned char new_rh_meas;
-    unsigned char await_rh_meas;
+    // unsigned char new_meas;
+    bool new_meas;
+    bool new_temp_meas;
+    bool new_rh_meas;
+    bool await_rh_meas;
     
 }SHT21;
 

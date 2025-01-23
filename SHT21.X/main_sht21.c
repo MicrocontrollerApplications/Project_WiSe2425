@@ -18,6 +18,7 @@
 //##############################################################################
 
 #include <xc.h>
+#include <stdbool.h>
 
 #include "uCQuick/uCQ_2018.h"
 #include "SHT21/SHT21.h"
@@ -36,12 +37,12 @@ static void __interrupt(high_priority) __isr(void);
 static SHT21 sht21_sensor = {
     .current_state = TEMPERATURE,
     .measurement_type = TEMPERATURE,
-    .state_transition = 0,
+    .state_transition = false,
     .measurement = 0,
-    .new_meas = 0,
-    .new_temp_meas = 0,
-    .new_rh_meas = 0,
-    .await_rh_meas = 0,
+    .new_meas = false,
+    .new_temp_meas = false,
+    .new_rh_meas = false,
+    .await_rh_meas = false,
 };
 
 int main() {
