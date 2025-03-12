@@ -114,7 +114,3 @@ Haben Sie Fragen? Dann fragen Sie uns! :)
 > Ich hatte Ihnen im Moodle versprochen, dass Sie das MSSP-Modul heute kennenlernen werden. Vielleicht könnte das ja 
 > Ihre Chance sein!
 
-___
-## TODOs
-  - [ ] Aufgabenbeschreibung anfertigen
-  - [ ] Code für Studenten vorbereiten
